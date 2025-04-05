@@ -1,6 +1,7 @@
 import { Path } from '../drawing/DoodleManager';
 import { ParticleSystem } from '../physics/ParticleSystem';
 import { Vector } from '../physics/Vector';
+import { playWhoosh, playHammerImpact, playCrumble } from '../audio/SoundEffectsPlayer';
 
 export class HammerSmash {
   private ctx: CanvasRenderingContext2D;
@@ -175,6 +176,9 @@ export class HammerSmash {
     this.smashCount = 0;
     // Don't reset pathScaleFactor to allow progressive flattening
 
+    // Play whoosh sound as hammer starts to swing
+    playWhoosh();
+
     // Find the center-line x-coordinate
     this.centerLineX = this.findCenterLineX();
 
@@ -214,6 +218,9 @@ export class HammerSmash {
     else if (this.animationProgress < this.animationDuration * 0.4) {
       // On first frame of impact, create particles and flatten the drawing
       if (this.animationProgress === Math.floor(this.animationDuration * 0.3)) {
+        // Play hammer impact sound
+        playHammerImpact();
+
         // Create impact particles
         this.createImpactParticles();
 
@@ -224,6 +231,9 @@ export class HammerSmash {
         // Flatten the drawing (reduce scale factor by 20% each time)
         this.pathScaleFactor *= 0.8;
         this.flattenPaths(this.pathScaleFactor);
+
+        // Play crumbling sound as the drawing flattens
+        playCrumble();
 
         // Find the new highest point after flattening
         this.highestPointY = this.findHighestPointOnCenterLine();
@@ -260,6 +270,9 @@ export class HammerSmash {
 
         // Clear particles from previous smash
         this.particleSystem.clear();
+
+        // Play whoosh sound for the next swing
+        playWhoosh();
 
         console.log(`Starting next smash at y=${this.highestPointY}`);
       } else {

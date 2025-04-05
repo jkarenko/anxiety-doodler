@@ -1,6 +1,7 @@
 import { Path } from '../drawing/DoodleManager';
 import { ParticleSystem } from '../physics/ParticleSystem';
 import { Vector } from '../physics/Vector';
+import { playExplosion, playPop } from '../audio/SoundEffectsPlayer';
 
 export class Exploder {
   private ctx: CanvasRenderingContext2D;
@@ -80,6 +81,9 @@ export class Exploder {
 
     // Create initial explosion particles
     this.createExplosionParticles();
+
+    // Play explosion sound
+    playExplosion();
   }
 
   /**
@@ -98,6 +102,9 @@ export class Exploder {
       // Add a new explosion ring every few frames
       if (this.animationProgress % 5 === 0) {
         this.addExplosionRing();
+
+        // Play pop sound for explosion ring
+        playPop();
       }
     } 
     // Phase 2: Particles scatter (20-100%)
@@ -105,6 +112,9 @@ export class Exploder {
       // Add occasional secondary explosions
       if (this.animationProgress % 15 === 0 && this.animationProgress < this.animationDuration * 0.6) {
         this.addSecondaryExplosion();
+
+        // Play smaller explosion sound
+        playExplosion(true); // true for small explosion
       }
     }
 
