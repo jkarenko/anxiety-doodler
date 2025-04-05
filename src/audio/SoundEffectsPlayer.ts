@@ -8,6 +8,12 @@
 // Map to store loaded audio elements
 const audioCache: Map<string, HTMLAudioElement> = new Map();
 
+// Map to store audio instances for reuse (to avoid iOS latency issues)
+const audioInstances: Map<string, HTMLAudioElement[]> = new Map();
+
+// Detect if running on iOS
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+
 // Default sound file paths
 const SOUND_PATHS = {
   // Impact sounds
@@ -41,8 +47,9 @@ let muted = false;
  * Preload a sound file into the audio cache
  * @param key - The identifier for the sound
  * @param path - The path to the sound file
+ * @param instanceCount - Number of instances to pre-create (for iOS)
  */
-export function preloadSound(key: string, path: string): void {
+export function preloadSound(key: string, path: string, instanceCount: number = 3): void {
   if (!audioCache.has(key)) {
     const audio = new Audio(path);
     audio.preload = 'auto';
@@ -50,6 +57,18 @@ export function preloadSound(key: string, path: string): void {
 
     // Load the audio file
     audio.load();
+
+    // For iOS, pre-create multiple instances to reduce latency
+    if (isIOS) {
+      const instances: HTMLAudioElement[] = [];
+      for (let i = 0; i < instanceCount; i++) {
+        const instance = new Audio(path);
+        instance.preload = 'auto';
+        instance.load();
+        instances.push(instance);
+      }
+      audioInstances.set(key, instances);
+    }
   }
 }
 
@@ -77,6 +96,33 @@ export function playSound(key: string, volume?: number, loop: boolean = false): 
     preloadSound(key, SOUND_PATHS[key as keyof typeof SOUND_PATHS]);
   }
 
+  // iOS-specific optimization to reduce latency
+  if (isIOS && audioInstances.has(key)) {
+    const instances = audioInstances.get(key)!;
+
+    // Find an instance that's not currently playing
+    let soundInstance = instances.find(instance => instance.paused);
+
+    if (!soundInstance && instances.length > 0) {
+      // If all instances are playing, reuse the first one
+      soundInstance = instances[0];
+      soundInstance.currentTime = 0;
+    }
+
+    if (soundInstance) {
+      soundInstance.volume = volume !== undefined ? volume : globalVolume;
+      soundInstance.loop = loop;
+
+      // Play the sound
+      soundInstance.play().catch(error => {
+        console.error(`Error playing sound "${key}" on iOS:`, error);
+      });
+
+      return soundInstance;
+    }
+  }
+
+  // Standard approach for non-iOS or fallback
   const audio = audioCache.get(key);
   if (audio) {
     // Clone the audio to allow overlapping sounds
