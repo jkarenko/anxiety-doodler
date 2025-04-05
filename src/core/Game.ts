@@ -4,7 +4,6 @@ import { DoodleManager } from '../drawing/DoodleManager';
 import { Renderer } from '../drawing/Renderer';
 
 export class Game {
-  private container: HTMLElement;
   private gameState: GameState;
   private canvas: Canvas;
   private doodleManager: DoodleManager;
@@ -12,24 +11,23 @@ export class Game {
   private animationFrameId: number | null = null;
 
   constructor(container: HTMLElement) {
-    this.container = container;
     this.gameState = new GameState();
     this.canvas = new Canvas(container);
     this.doodleManager = new DoodleManager();
     this.renderer = new Renderer(this.canvas.getContext());
-    
+
     this.setupEventListeners();
   }
 
   private setupEventListeners(): void {
     const canvasElement = this.canvas.getElement();
-    
+
     // Mouse events
     canvasElement.addEventListener('mousedown', this.handlePointerStart.bind(this));
     canvasElement.addEventListener('mousemove', this.handlePointerMove.bind(this));
     canvasElement.addEventListener('mouseup', this.handlePointerEnd.bind(this));
     canvasElement.addEventListener('mouseout', this.handlePointerEnd.bind(this));
-    
+
     // Touch events for mobile
     canvasElement.addEventListener('touchstart', this.handleTouchStart.bind(this));
     canvasElement.addEventListener('touchmove', this.handleTouchMove.bind(this));
@@ -45,7 +43,7 @@ export class Game {
 
   private handlePointerMove(e: MouseEvent): void {
     if (!this.gameState.isDrawing()) return;
-    
+
     const { offsetX, offsetY } = e;
     this.doodleManager.addPoint(offsetX, offsetY);
     this.render();
@@ -60,12 +58,12 @@ export class Game {
   private handleTouchStart(e: TouchEvent): void {
     e.preventDefault();
     if (e.touches.length !== 1) return;
-    
+
     const touch = e.touches[0];
     const rect = this.canvas.getElement().getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-    
+
     this.gameState.setDrawing(true);
     this.doodleManager.startPath(x, y);
   }
@@ -73,12 +71,12 @@ export class Game {
   private handleTouchMove(e: TouchEvent): void {
     e.preventDefault();
     if (!this.gameState.isDrawing() || e.touches.length !== 1) return;
-    
+
     const touch = e.touches[0];
     const rect = this.canvas.getElement().getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-    
+
     this.doodleManager.addPoint(x, y);
     this.render();
   }
@@ -97,7 +95,7 @@ export class Game {
   private gameLoop(): void {
     // For now, we just render the current state
     this.render();
-    
+
     // Continue the game loop
     this.animationFrameId = requestAnimationFrame(this.gameLoop.bind(this));
   }
