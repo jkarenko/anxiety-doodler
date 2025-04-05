@@ -11,26 +11,26 @@ const audioCache: Map<string, HTMLAudioElement> = new Map();
 // Default sound file paths
 const SOUND_PATHS = {
   // Impact sounds
-  hammerImpact: '/anxiety-doodler/sounds/hammer-impact.mp3',
-  softImpact: '/anxiety-doodler/sounds/soft-impact.mp3',
-  hardImpact: '/anxiety-doodler/sounds/hard-impact.mp3',
+  hammerImpact: './sounds/hammer-impact.mp3',
+  softImpact: './sounds/soft-impact.mp3',
+  hardImpact: './sounds/hard-impact.mp3',
 
   // Movement sounds
-  whoosh: '/anxiety-doodler/sounds/whoosh.mp3',
-  swipe: '/anxiety-doodler/sounds/swipe.mp3',
+  whoosh: './sounds/whoosh.mp3',
+  swipe: './sounds/swipe.mp3',
 
   // Explosion sounds
-  explosion: '/anxiety-doodler/sounds/explosion.mp3',
-  smallExplosion: '/anxiety-doodler/sounds/small-explosion.mp3',
+  explosion: './sounds/explosion.mp3',
+  smallExplosion: './sounds/small-explosion.mp3',
 
   // Fire sounds
-  fire: '/anxiety-doodler/sounds/fire.mp3',
-  burn: '/anxiety-doodler/sounds/burn.mp3',
+  fire: './sounds/fire.mp3',
+  burn: './sounds/burn.mp3',
 
   // Misc sounds
-  pop: '/anxiety-doodler/sounds/pop.mp3',
-  bounce: '/anxiety-doodler/sounds/bounce.mp3',
-  crumble: '/anxiety-doodler/sounds/crumble.mp3'
+  pop: './sounds/pop.mp3',
+  bounce: './sounds/bounce.mp3',
+  crumble: './sounds/crumble.mp3'
 };
 
 // Global volume control (0.0 to 1.0)
