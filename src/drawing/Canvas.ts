@@ -24,27 +24,38 @@ export class Canvas {
     // Set initial size
     this.resizeCanvas();
 
-    // Add resize event listener
+    // Add resize and orientation change event listeners
     window.addEventListener('resize', this.resizeCanvas.bind(this));
+    window.addEventListener('orientationchange', this.resizeCanvas.bind(this));
   }
 
   /**
    * Resize the canvas to appropriate dimensions
    */
   private resizeCanvas(): void {
-    // Check if we're on mobile
-    const isMobile = window.innerWidth <= 768;
+    // Determine device type based on screen width
+    const isSmallMobile = window.innerWidth <= 480; // iPhone and small devices
+    const isMobile = window.innerWidth <= 768; // Tablets and medium devices
+    const isIpadPro = window.innerWidth > 768 && window.innerWidth <= 1024; // iPad Pro
 
     let canvasWidth, canvasHeight;
 
-    if (isMobile) {
-      // On mobile, use 95% of container width and 70% of container height
+    if (isSmallMobile) {
+      // For iPhone and small mobile devices
       canvasWidth = this.container.clientWidth * 0.95;
-      canvasHeight = this.container.clientHeight * 0.7;
+      canvasHeight = this.container.clientHeight * 0.8; // Slightly smaller height ratio for small screens
+    } else if (isMobile) {
+      // For tablets and medium-sized devices
+      canvasWidth = this.container.clientWidth * 0.95;
+      canvasHeight = this.container.clientHeight * 0.85;
+    } else if (isIpadPro) {
+      // For iPad Pro
+      canvasWidth = this.container.clientWidth * 0.9;
+      canvasHeight = this.container.clientHeight * 0.85;
     } else {
-      // On desktop, use fixed dimensions
-      canvasWidth = Math.min(800, this.container.clientWidth * 0.8);
-      canvasHeight = Math.min(600, this.container.clientHeight * 0.8);
+      // For desktop
+      canvasWidth = Math.min(900, this.container.clientWidth * 0.9); // Slightly larger max width
+      canvasHeight = Math.min(700, this.container.clientHeight * 0.9); // Slightly larger max height
     }
 
     // Set canvas dimensions
