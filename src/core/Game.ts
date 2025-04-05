@@ -70,6 +70,10 @@ export class Game {
 
   private handlePointerStart(e: MouseEvent): void {
     e.preventDefault();
+
+    // Prevent drawing if an animation is playing
+    if (this.gameState.isAnimationPlaying()) return;
+
     const { offsetX, offsetY } = e;
 
     // Only reset animation classes and clear paths if a destruction method has been used
@@ -107,6 +111,9 @@ export class Game {
   private handleTouchStart(e: TouchEvent): void {
     e.preventDefault();
     if (e.touches.length !== 1) return;
+
+    // Prevent drawing if an animation is playing
+    if (this.gameState.isAnimationPlaying()) return;
 
     const touch = e.touches[0];
     const rect = this.canvas.getElement().getBoundingClientRect();
@@ -232,6 +239,9 @@ export class Game {
     // Set the destruction method
     this.gameState.setDestructionMethod(method);
     this.gameState.setAnimating(true);
+
+    // Disable drawing while animation is playing
+    this.gameState.setDrawing(false);
 
     // Mark that a destruction method has been used
     this.destructionMethodUsed = true;
