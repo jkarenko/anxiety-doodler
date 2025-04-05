@@ -21,6 +21,9 @@ export class Game {
   // UI elements
   private destructionButtons!: HTMLDivElement;
 
+  // Flag to track if a destruction method has been used
+  private destructionMethodUsed: boolean = false;
+
   constructor(container: HTMLElement) {
     this.gameState = new GameState();
     this.canvas = new Canvas(container);
@@ -68,6 +71,21 @@ export class Game {
   private handlePointerStart(e: MouseEvent): void {
     e.preventDefault();
     const { offsetX, offsetY } = e;
+
+    // Only reset animation classes and clear paths if a destruction method has been used
+    if (this.destructionMethodUsed) {
+      // Reset animation classes when starting a new doodle
+      this.hammerSmash.reset();
+      this.exploder.reset();
+      this.burner.reset();
+
+      // Clear existing paths
+      this.doodleManager.clearPaths();
+
+      // Reset the destruction method used flag
+      this.destructionMethodUsed = false;
+    }
+
     this.gameState.setDrawing(true);
     this.doodleManager.startPath(offsetX, offsetY);
   }
@@ -94,6 +112,20 @@ export class Game {
     const rect = this.canvas.getElement().getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
+
+    // Only reset animation classes and clear paths if a destruction method has been used
+    if (this.destructionMethodUsed) {
+      // Reset animation classes when starting a new doodle
+      this.hammerSmash.reset();
+      this.exploder.reset();
+      this.burner.reset();
+
+      // Clear existing paths
+      this.doodleManager.clearPaths();
+
+      // Reset the destruction method used flag
+      this.destructionMethodUsed = false;
+    }
 
     this.gameState.setDrawing(true);
     this.doodleManager.startPath(x, y);
@@ -201,6 +233,9 @@ export class Game {
     this.gameState.setDestructionMethod(method);
     this.gameState.setAnimating(true);
 
+    // Mark that a destruction method has been used
+    this.destructionMethodUsed = true;
+
     // Disable destruction buttons during animation
     const buttons = this.destructionButtons.querySelectorAll('button');
     buttons.forEach(button => {
@@ -237,11 +272,20 @@ export class Game {
     // Stop the game loop since animation is complete
     this.stop();
 
+    const currentMethod = this.gameState.getDestructionMethod();
     this.gameState.setAnimating(false);
     this.gameState.setDestructionMethod(DestructionMethod.NONE);
 
-    // Clear the doodle
-    this.doodleManager.clearPaths();
+    // Handle different destruction methods
+    if (currentMethod === DestructionMethod.HAMMER) {
+      // For hammer, update the doodle manager with the flattened paths
+      // This allows the flattened drawing to persist after hammer smashes
+      const flattenedPaths = this.hammerSmash.getPaths();
+      this.doodleManager.setPaths(flattenedPaths);
+    } else {
+      // For other methods, clear the doodle
+      this.doodleManager.clearPaths();
+    }
 
     // Enable reset button after animation
     const resetButton = this.destructionButtons.querySelector('button:last-child');
@@ -260,13 +304,16 @@ export class Game {
     // Stop the game loop
     this.stop();
 
-    // Stop any running animations
-    this.hammerSmash.stop();
-    this.exploder.stop();
-    this.burner.stop();
+    // Stop any running animations and reset their state
+    this.hammerSmash.reset();
+    this.exploder.reset();
+    this.burner.reset();
 
     // Reset game state
     this.gameState.reset();
+
+    // Reset the destruction method used flag
+    this.destructionMethodUsed = false;
 
     // Clear the doodle
     this.doodleManager.clearPaths();

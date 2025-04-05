@@ -319,6 +319,17 @@ export class Burner {
     this.particleSystem.clear();
     this.burnPoints = [];
   }
+
+  /**
+   * Reset the animation state and clear paths
+   */
+  public reset(): void {
+    this.paths = [];
+    this.totalSegments = 0;
+    this.burnedSegments = 0;
+    this.animationProgress = 0;
+    this.stop();
+  }
 }
 
 interface BurnPoint {

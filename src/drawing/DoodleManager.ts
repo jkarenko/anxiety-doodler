@@ -28,7 +28,7 @@ export class DoodleManager {
       color: this.lineColor,
       width: this.lineWidth
     };
-    
+
     // Add the new path to the paths array
     this.paths.push(this.currentPath);
   }
@@ -41,7 +41,7 @@ export class DoodleManager {
       this.startPath(x, y);
       return;
     }
-    
+
     this.currentPath.points.push({ x, y });
   }
 
@@ -57,6 +57,14 @@ export class DoodleManager {
    */
   public getPaths(): Path[] {
     return this.paths;
+  }
+
+  /**
+   * Set paths directly
+   */
+  public setPaths(paths: Path[]): void {
+    this.paths = paths;
+    this.currentPath = null;
   }
 
   /**

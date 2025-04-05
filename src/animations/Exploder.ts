@@ -21,10 +21,10 @@ export class Exploder {
     this.ctx = ctx;
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
-    
+
     // Initialize explosion center at center of canvas
     this.explosionCenter = new Vector(this.canvasWidth / 2, this.canvasHeight / 2);
-    
+
     // Initialize particle system
     this.particleSystem = new ParticleSystem(this.explosionCenter.x, this.explosionCenter.y);
   }
@@ -48,18 +48,18 @@ export class Exploder {
    */
   public start(): void {
     if (this.isAnimating) return;
-    
+
     this.isAnimating = true;
     this.animationProgress = 0;
     this.explosionRadius = 0;
     this.explosionRings = [];
-    
+
     // Calculate the explosion center (center of all paths)
     if (this.paths.length > 0) {
       let totalX = 0;
       let totalY = 0;
       let pointCount = 0;
-      
+
       for (const path of this.paths) {
         for (const point of path.points) {
           totalX += point.x;
@@ -67,17 +67,17 @@ export class Exploder {
           pointCount++;
         }
       }
-      
+
       if (pointCount > 0) {
         this.explosionCenter.x = totalX / pointCount;
         this.explosionCenter.y = totalY / pointCount;
       }
     }
-    
+
     // Reset particle system
     this.particleSystem.setOrigin(this.explosionCenter.x, this.explosionCenter.y);
     this.particleSystem.clear();
-    
+
     // Create initial explosion particles
     this.createExplosionParticles();
   }
@@ -87,14 +87,14 @@ export class Exploder {
    */
   public update(): boolean {
     if (!this.isAnimating) return false;
-    
+
     this.animationProgress++;
-    
+
     // Phase 1: Initial explosion (0-20%)
     if (this.animationProgress < this.animationDuration * 0.2) {
       const progress = this.animationProgress / (this.animationDuration * 0.2);
       this.explosionRadius = this.maxExplosionRadius * progress;
-      
+
       // Add a new explosion ring every few frames
       if (this.animationProgress % 5 === 0) {
         this.addExplosionRing();
@@ -107,32 +107,32 @@ export class Exploder {
         this.addSecondaryExplosion();
       }
     }
-    
+
     // Update explosion rings
     for (let i = this.explosionRings.length - 1; i >= 0; i--) {
       const ring = this.explosionRings[i];
       ring.radius += ring.speed;
       ring.alpha -= 0.02;
-      
+
       if (ring.alpha <= 0) {
         this.explosionRings.splice(i, 1);
       }
     }
-    
+
     // Update particles
     this.particleSystem.update();
-    
+
     // Apply gravity to particles
     const gravity = new Vector(0, 0.05);
     this.particleSystem.applyForce(gravity);
-    
+
     // Check if animation is complete
     if (this.animationProgress >= this.animationDuration && this.particleSystem.isEmpty()) {
       this.isAnimating = false;
       this.onComplete();
       return false;
     }
-    
+
     return true;
   }
 
@@ -150,7 +150,7 @@ export class Exploder {
         [40, 80] // Life range
       );
     }
-    
+
     // Add some explosion particles at the center
     this.particleSystem.addParticles(
       30, // Number of particles
@@ -160,7 +160,7 @@ export class Exploder {
       [4, 10], // Size range
       [30, 60] // Life range
     );
-    
+
     // Apply an outward force to simulate explosion
     for (let i = 0; i < 10; i++) {
       const angle = Math.random() * Math.PI * 2;
@@ -179,12 +179,12 @@ export class Exploder {
         (Math.random() * 2 - 1) * 50,
         (Math.random() * 2 - 1) * 50
       );
-      
+
       const explosionPoint = new Vector(
         this.explosionCenter.x + offset.x,
         this.explosionCenter.y + offset.y
       );
-      
+
       // Add some explosion particles
       this.particleSystem.addParticles(
         10, // Number of particles
@@ -194,7 +194,7 @@ export class Exploder {
         [3, 8], // Size range
         [20, 40] // Life range
       );
-      
+
       // Add an explosion ring
       this.explosionRings.push({
         x: explosionPoint.x,
@@ -228,7 +228,7 @@ export class Exploder {
    */
   public draw(): void {
     if (!this.isAnimating && this.particleSystem.isEmpty() && this.explosionRings.length === 0) return;
-    
+
     // Draw explosion rings
     for (const ring of this.explosionRings) {
       this.ctx.save();
@@ -240,7 +240,7 @@ export class Exploder {
       this.ctx.stroke();
       this.ctx.restore();
     }
-    
+
     // Draw particles
     this.particleSystem.draw(this.ctx);
   }
@@ -259,6 +259,17 @@ export class Exploder {
     this.isAnimating = false;
     this.particleSystem.clear();
     this.explosionRings = [];
+  }
+
+  /**
+   * Reset the animation state and clear paths
+   */
+  public reset(): void {
+    this.paths = [];
+    this.animationProgress = 0;
+    this.explosionRadius = 0;
+    this.explosionCenter = new Vector(this.canvasWidth / 2, this.canvasHeight / 2); // Reset to center of canvas
+    this.stop();
   }
 }
 
