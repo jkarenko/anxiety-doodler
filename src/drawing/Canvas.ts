@@ -8,9 +8,8 @@ export class Canvas {
     this.canvas = document.createElement('canvas');
     this.canvas.className = 'drawing-canvas';
 
-    // Set canvas styles
-    this.canvas.style.display = 'block';
-    this.canvas.style.touchAction = 'none'; // Prevents scrolling while drawing on touch devices
+    // Note: All canvas styles (background-color, border-radius, box-shadow, touch-action, display)
+    // are set in the .drawing-canvas CSS class
 
     // Append canvas to container
     container.appendChild(this.canvas);
