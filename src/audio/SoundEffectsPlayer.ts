@@ -143,12 +143,84 @@ export function playHammerImpact(volume?: number): HTMLAudioElement | undefined 
   return playSound('hammerImpact', volume);
 }
 
+// Define a sample with start time and duration
+interface SoundSample {
+  start: number;
+  duration: number;
+}
+
+const WHOOSH_SAMPLES: SoundSample[] = [
+  { start: 0, duration: 0.5 },
+  { start: 0.5, duration: 0.5 },
+  { start: 1.0, duration: 0.5 },
+  { start: 1.5, duration: 0.5 }
+];
+
+const CRUMBLE_SAMPLES: SoundSample[] = [] = [
+    { start: 0, duration: 1.0 },
+    { start: 1.0, duration: 1.0 },
+    { start: 2.0, duration: 1.0 },
+    { start: 3.0, duration: 1.0 }
+];
+
+
+
 /**
- * Play a whoosh sound (for swinging motions)
+ * Play a random sample from a sound file
+ * @param key - The identifier for the sound to play
+ * @param samples - Array of samples with start times and durations
+ * @param volume - Optional volume override (0.0 to 1.0)
+ * @returns The audio element that's playing, or undefined if the sound couldn't be played
+ */
+export function playSoundSample(
+  key: string, 
+  samples: SoundSample[], 
+  volume?: number
+): HTMLAudioElement | undefined {
+  if (muted) return undefined;
+
+  // If the sound isn't cached, try to load it
+  if (!audioCache.has(key) && key in SOUND_PATHS) {
+    preloadSound(key, SOUND_PATHS[key as keyof typeof SOUND_PATHS]);
+  }
+
+  const audio = audioCache.get(key);
+  if (audio) {
+    // Clone the audio to allow overlapping sounds
+    const soundInstance = new Audio(audio.src);
+    soundInstance.volume = volume !== undefined ? volume : globalVolume;
+
+    // Select a random sample
+    const randomSample = samples[Math.floor(Math.random() * samples.length)];
+
+    // Set the start time to play only the selected sample
+    soundInstance.currentTime = randomSample.start;
+
+    // Play the sound asynchronously to avoid blocking the main thread
+    setTimeout(() => {
+      soundInstance.play().catch(error => {
+        console.error(`Error playing sound "${key}":`, error);
+      });
+
+      // Stop the sound after the sample duration
+      setTimeout(() => {
+        stopSound(soundInstance);
+      }, randomSample.duration * 1000);
+    }, 0);
+
+    return soundInstance;
+  }
+
+  console.warn(`Sound "${key}" not found in audio cache`);
+  return undefined;
+}
+
+/**
+ * Play a random whoosh sound sample from the whoosh.mp3 file
  * @param volume - Optional volume override
  */
 export function playWhoosh(volume?: number): HTMLAudioElement | undefined {
-  return playSound('whoosh', volume);
+  return playSoundSample('whoosh', WHOOSH_SAMPLES, volume);
 }
 
 /**
@@ -174,7 +246,7 @@ export function playFireSound(continuous: boolean = false, volume?: number): HTM
  * @param volume - Optional volume override
  */
 export function playCrumble(volume?: number): HTMLAudioElement | undefined {
-  return playSound('crumble', volume);
+  return playSoundSample('crumble', CRUMBLE_SAMPLES, volume);
 }
 
 /**
