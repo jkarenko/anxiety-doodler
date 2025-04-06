@@ -10,7 +10,7 @@ body {
 }
 #app {
     width: 100%;
-    height: 90%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -39,6 +39,7 @@ h1 {
     width: 90%;
     color: #666;
 }
+
 #canvas-container {
     width: 100%;
     display: flex;
@@ -46,13 +47,17 @@ h1 {
     align-items: flex-start;
     margin: 0;
     flex-grow: 1;
+    position: relative;
 }
+
 #controls {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-top: 10px;
-    padding: 10px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding-bottom: 40px;
 }
 .drawing-canvas {
     background-color: white;
@@ -99,28 +104,36 @@ h1 {
     font-weight: bold;
 }
 
-/* iPad Pro */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .game-title {
-        max-width: 250px;
-    }
-    .instructions {
-        font-size: 1rem;
-        max-width: 500px;
-    }
+/* Larger screens */
+@media (min-width: 1025px) {
     #app {
-        padding: 15px;
+        flex-direction: row;
+        flex-wrap: nowrap;
     }
-    .destruction-button, .reset-button {
-        padding: 10px 20px;
-        font-size: 1.1rem;
+
+    .game-title {
+        margin-right: 20px;
+    }
+
+    .instructions {
+        order: 0;
+        font-size: 1.5rem;
+    }
+
+    #canvas-container {
+        width: 70%;
+    }
+
+    #controls {
+        width: auto;
+        flex-direction: column;
+        align-items: center;
     }
 }
 
 /* Tablets and smaller devices */
 @media (max-width: 768px) {
     h1 {
-        font-size: 1.8rem;
         margin-bottom: 5px;
     }
     .game-title {
@@ -139,48 +152,14 @@ h1 {
 /* iPhone and small mobile devices */
 @media (max-width: 480px) {
     .game-title {
-        max-width: 150px;
+        /*max-width: 150px;*/
     }
     .instructions {
         font-size: 0.8rem;
     }
     .destruction-button, .reset-button {
-        padding: 6px 12px;
-        font-size: 0.9rem;
-    }
-    #controls {
-        gap: 5px;
-        padding: 5px;
-    }
-}
-
-/* Orientation-specific styles */
-@media (orientation: landscape) {
-    /* Landscape mode */
-    #app {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .game-title {
-        margin-right: 10px;
-    }
-
-    .instructions {
-        width: 100%;
-        order: -1;
-        margin-bottom: 10px;
-    }
-
-    #canvas-container {
-        width: 70%;
-    }
-
-    #controls {
-        width: 25%;
-        flex-direction: column;
-        align-items: center;
+        font-size: 0.8rem;
+        padding: 6px 6px;
     }
 }
 
