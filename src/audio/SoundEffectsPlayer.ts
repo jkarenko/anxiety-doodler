@@ -33,7 +33,7 @@ player.registerSamples('crumble', CRUMBLE_SAMPLES);
 player.preloadAllSounds();
 
 export function playHammerImpact(volume?: number): HTMLAudioElement | undefined {
-  return player.playSound('hammerImpact', volume);
+  return player.playSound('hammerImpact', volume, false, 0.03);
 }
 
 export function playWhoosh(volume?: number): HTMLAudioElement | undefined {
@@ -41,7 +41,7 @@ export function playWhoosh(volume?: number): HTMLAudioElement | undefined {
 }
 
 export function playExplosion(small: boolean = false, volume?: number): HTMLAudioElement | undefined {
-  return player.playSound(small ? 'smallExplosion' : 'explosion', volume);
+  return player.playSound(small ? 'smallExplosion' : 'explosion', volume, false, 0.05);
 }
 
 export function playCrumble(volume?: number): HTMLAudioElement | undefined {

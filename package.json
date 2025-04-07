@@ -13,6 +13,6 @@
     "vite": "^6.2.0"
   },
   "dependencies": {
-    "sfx-player": "^1.0.0"
+    "sfx-player": "^1.1.1"
   }
 }
